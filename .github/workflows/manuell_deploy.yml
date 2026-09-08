@@ -1,0 +1,52 @@
+name: "Manuell deploy til dev"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-test.yml
+    secrets: inherit
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+  deploy_dev_historisk:
+    needs:
+      - build
+    name: "Deploy til dev (historisk)"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til dev-fss (historisk)
+        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: nais/app/backend.yaml
+          VARS: nais/dev.json
+          IMAGE: ${{ needs.build.outputs.image }}
+          TELEMETRY: ${{ needs.build.outputs.telemetry }}
+
+  deploy_dev_helt:
+    needs:
+      - build
+    name: "Deploy til dev (helt)"
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy til dev-fss (helt)
+        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: nais/app/backend_helt.yaml
+          VARS: nais/dev.json
+          IMAGE: ${{ needs.build.outputs.image }}
+          TELEMETRY: ${{ needs.build.outputs.telemetry }}

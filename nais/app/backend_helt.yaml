@@ -1,0 +1,101 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: {{helt.app}}
+  namespace: "historisk"
+  labels:
+    team: "historisk"
+spec:
+  image: {{ image }}
+  port: 8080
+  azure:
+    application:
+      enabled: true
+      tenant: {{azureTenant}}
+      allowAllUsers: false
+      claims:
+        extra:
+          - NAVident
+        groups:
+          - id: {{gruppe.admin}}
+  webproxy: true
+  vault:
+    enabled: true
+    paths:
+      - kvPath: {{helt.vault.credentials}}
+        mountPath: /secrets/oracle/credentials
+      - kvPath: {{helt.vault.config}}
+        mountPath: /secrets/oracle/config
+  accessPolicy:
+    inbound:
+      rules:
+        - application: historisk-helt-infotrygd
+          namespace: historisk
+          cluster: {{env}}-gcp
+          permissions:
+            roles:
+              # ip-tabeller
+              - ip_personkort_90
+              # sak-tabeller
+              - sa_sak_10
+              - t_helsetjeneste
+              - t_helsetj_utbet
+              - t_lopenr_fnr
+              - t_regel_konto
+              - t_kodeverk
+    outbound:
+      rules: []
+  strategy:
+    type: RollingUpdate
+  liveness:
+    path: /actuator/health
+    initialDelay: 20
+    timeout: 5
+    periodSeconds: 5
+    failureThreshold: 50
+  readiness:
+    path: /actuator/health
+    initialDelay: 20
+    timeout: 5
+    failureThreshold: 1000
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 1024Mi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+  replicas:
+    min: 1
+    max: 2
+    cpuThresholdPercentage: 90
+  prometheus:
+    enabled: true
+    path: /actuator/prometheus
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
+  ingresses:
+    - {{helt.appIngress}}
+    - {{helt.appInternalIngress}}
+  env:
+    - name: APP_DDL_AUTO
+      value: "none"
+    - name: APP_GRUPPE_ADMIN
+      value: "{{gruppe.admin}}"
+    - name: APP_TILGANGER_PENSJON
+      value: "{{tilganger.pensjon}}"
+    - name: APP_AUDIT_HOST
+      value: "audit.nais"
+    - name: APP_AUDIT_PORT
+      value: "6514"
+    - name: APP_UTTREKKSHENTERE_ROWID
+      value: "ip_personkort_90"
+    - name: spring_profiles_active
+      value: "{{springProfiles}}"
+    - name: "APP_DEFAULT_SCHEMA"
+      value: "{{helt.schema}}"
+    - name: "APP_DDL_AUTO"
+      value: "none"

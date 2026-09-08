@@ -1,0 +1,64 @@
+server.port: 8080
+
+app:
+  tilganger:
+    pensjon: ${APP_TILGANGER_PENSJON}
+  uttrekkshentere:
+    rowid: ${APP_UTTREKKSHENTERE_ROWID:}
+    id: ${APP_UTTREKKSHENTERE_ID:}
+
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: ${NAIS_APP_NAME:historisk-pensjon}
+  jackson:
+    serialization:
+      indent_output: true
+  datasource:
+    hikari:
+      schema: ${APP_DEFAULT_SCHEMA}
+      maximum-pool-size: 2
+    url: ${APP_DATASOURCE_URL}
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    platform: org.hibernate.dialect.Oracle10gDialect
+    username: ${APP_DATASOURCE_USERNAME}
+    password: ${APP_DATASOURCE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    hibernate:
+      ddl-auto: ${APP_DDL_AUTO:validate}
+      globally_quoted_identifiers_skip_column_definitions: false
+    properties:
+      hibernate:
+        default_schema: ${APP_DEFAULT_SCHEMA:}
+
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+#oidc...
+http.proxy.parametername: notused
+
+audit:
+  syslog:
+    host: ${APP_AUDIT_HOST}
+    port: ${APP_AUDIT_PORT}
+
+no.nav.security.jwt:
+  expirythreshold: 60 #threshold in minutes until token expires
+  issuer:
+    azure:
+      discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+      accepted_audience: ${AZURE_APP_CLIENT_ID}
+
+logging:
+  config: classpath:logback-spring.xml
+springdoc:
+  swaggerUi:
+    tryItOutEnabled: true

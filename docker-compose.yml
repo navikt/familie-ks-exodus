@@ -1,0 +1,94 @@
+services:
+  ingress:
+    image: alpine/socat
+    command:
+      "tcp-l:80,fork,reuseaddr tcp:wonderwall:80"
+    ports:
+      - "3000:80"
+
+  wonderwall:
+    image: ghcr.io/nais/wonderwall:2026-08-14-123343-d0fccc8
+    #todo oppdater navn
+    command:
+      - "--bind-address"
+      - "0.0.0.0:80"
+      - "--openid.client-id"
+      - "historisk-tidsbegrenset-uforestonad"
+      - "--openid.client-jwk"
+      - '{"p":"9t_h1HEssg4rs1Dlxdxi0QhIFoYH9hlvaGu76jiYZEZJVL1W1WbDPk0gzusWSTBH3Kzg7CzrOiuZdXDrDaqZHgtLA5aprPX7C4vXY6zhGfzNCq63cucTBXS_MPVkza-MFlItHOJPcgqgFbwkpEtyW1EFDzvSea1qlaI6CQoufTM","kty":"RSA","q":"ryulabkw7nQyke21_cUPFy6v-w1g7tHuZbvgb9kb3yAW4oKNJWa2Jh31V695XscusvabatxcGUDjKrlBcn9KlrB3iYGr46JmmjpQr-7i7bLTwEOYtkqY7t9SR9HgImUGpDWwYZZ28nfG8INSD6A5bC3FsaVJU6Ln7zU1DfngZzs","d":"fpefJ64zI5l0G4PLFTLt-1szXCyYIVTAFsm0sB2YRlYoDnW_SK9xTRk0DE1kgTTWwXrj66Rje-okLfEa1GghBro4YHCAkZR8nrVUuPvSjDCq7yPpJNHohMYDFwNg4ehO98G5f416oSzVIxz0NXYu60aHFqNfYCtuU_ADcLTIUrVJVUxjq7ASPy4fxp5cmV_YLt9ju0QqoNpqKY1Q45fwy8-98ie32VNQolJOedS6IIWDae3FqovxodbaaM3WHZvx6B1dAza-VvSjkmeLqLrqpZ4ZgA17s5hI57UAXORCeSino0Cr7ENp_gUI7zuwdzsjVaZ4Yx4g2FsUa2mB_MY2NQ","e":"AQAB","use":"sig","kid":"RQ5eRb0TEpsJ6KYAsnM9C8jQQ0M-lnX-wtFvBczd4Bk","qi":"ov4Tq9C5w8RZddHSGPdAI_qVvM9rtpXbsapqrqk5bIht6MFnydvEX3xwFpxrkXKc0mgxIz6hVyVxzqCSvTBy7pYjn-O-ces7oMVGXTEKH8jkX2ggyl71ot5U7bCrBFFBFmR6wS70Ift4C2cm5Wd7QnoTh8YFifKFUDhlv_siQRA","dp":"OMlo5fgegtqVnMq3_9pg9JpGEsBD5o0VPlzBve_ExhQQ3CgtaCsaMCOHr3EOEEnFzfIKTulKNng-9W_C8cLTM8D_QVUPtJRkadSB-BCVOugWtiVYV1rl2jRvojBgPpvpylyeue0ovx_IkRdVCmG8bVrmogltscV9JexKEzg_V1c","alg":"RS256","dq":"jlLoEv5kw1mlvOtm8skpeax1T4WPPHtVN1NvB3FfM-rerStlgv3xAQdWT-hCtL8hMkcr_6cLLXmLGStsAZtq_wRiG1dAUbOhqa234To3JuolIhHKAlKZ73uDXtcnRMrQmpsEtEWMX3TyLniENC36eeq2tZ-V9F5oE_MnKDPeIAE","n":"qO0if2kFF27iIeQVyxVEj6QWSQbFyBMlyGRuXi4skPYFKd7o7-RdCPPTDjYkEsrxLBR7XG8wFiwBEFOyB4LN0Ef4F0XmNYmdjZiyQfYgCTDSFRVouj879mwYcP-TxmXjMjx19FREBrCkS_eNYUWdUJD17iz-fb_zp1EbpT3cms3nlvSG_ULJow69B-4sqRgNX3kPP8_HAqaXoH2LEN6IgWptAAE4v3LDBHvlquM-OPtj3dnGzxL7smDNgu2F7lJakDC6T58i8bUYwueSl0KMjf705bQ-h3FbwmZsy1vukihoqcd2OwOhSf5E6IyL9MfEmewBBED2JUMBZA45NLZfwQ"}'
+      - "--openid.well-known-url"
+      - "http://host.docker.internal:8102/azure-mock/.well-known/openid-configuration"
+      - "--ingress"
+      - "http://localhost:3000"
+      - "--upstream-host"
+      - "backend-proxy:80"
+      - "--openid.scopes"
+      - "oidc-auth-proxy/.default"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    ports:
+      - "4000:80"
+    depends_on:
+      - "mock-oidc"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  backend-proxy:
+    image: alpine/socat
+    command:
+      "tcp-l:80,fork,reuseaddr tcp:host.docker.internal:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mock-oidc:
+    build: mock-oidc
+    ports:
+     - "8102:8102"
+    environment:
+      JSON_CONFIG_PATH: /config.json
+      SERVER_PORT: "8102"
+
+  backend:
+    build: .
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      APP_DDL_AUTO: "none"
+      spring_profiles_active: "debug-sql"
+      AZURE_APP_WELL_KNOWN_URL: "http://host.docker.internal:8102/azure-mock/.well-known/openid-configuration"
+      #Todo fiks navn
+      AZURE_APP_CLIENT_ID: "historisk-tidsbegrenset-uforestonad"
+      AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: "http://localhost:9999" # todo
+      AZURE_APP_JWK: '{"p":"9t_h1HEssg4rs1Dlxdxi0QhIFoYH9hlvaGu76jiYZEZJVL1W1WbDPk0gzusWSTBH3Kzg7CzrOiuZdXDrDaqZHgtLA5aprPX7C4vXY6zhGfzNCq63cucTBXS_MPVkza-MFlItHOJPcgqgFbwkpEtyW1EFDzvSea1qlaI6CQoufTM","kty":"RSA","q":"ryulabkw7nQyke21_cUPFy6v-w1g7tHuZbvgb9kb3yAW4oKNJWa2Jh31V695XscusvabatxcGUDjKrlBcn9KlrB3iYGr46JmmjpQr-7i7bLTwEOYtkqY7t9SR9HgImUGpDWwYZZ28nfG8INSD6A5bC3FsaVJU6Ln7zU1DfngZzs","d":"fpefJ64zI5l0G4PLFTLt-1szXCyYIVTAFsm0sB2YRlYoDnW_SK9xTRk0DE1kgTTWwXrj66Rje-okLfEa1GghBro4YHCAkZR8nrVUuPvSjDCq7yPpJNHohMYDFwNg4ehO98G5f416oSzVIxz0NXYu60aHFqNfYCtuU_ADcLTIUrVJVUxjq7ASPy4fxp5cmV_YLt9ju0QqoNpqKY1Q45fwy8-98ie32VNQolJOedS6IIWDae3FqovxodbaaM3WHZvx6B1dAza-VvSjkmeLqLrqpZ4ZgA17s5hI57UAXORCeSino0Cr7ENp_gUI7zuwdzsjVaZ4Yx4g2FsUa2mB_MY2NQ","e":"AQAB","use":"sig","kid":"RQ5eRb0TEpsJ6KYAsnM9C8jQQ0M-lnX-wtFvBczd4Bk","qi":"ov4Tq9C5w8RZddHSGPdAI_qVvM9rtpXbsapqrqk5bIht6MFnydvEX3xwFpxrkXKc0mgxIz6hVyVxzqCSvTBy7pYjn-O-ces7oMVGXTEKH8jkX2ggyl71ot5U7bCrBFFBFmR6wS70Ift4C2cm5Wd7QnoTh8YFifKFUDhlv_siQRA","dp":"OMlo5fgegtqVnMq3_9pg9JpGEsBD5o0VPlzBve_ExhQQ3CgtaCsaMCOHr3EOEEnFzfIKTulKNng-9W_C8cLTM8D_QVUPtJRkadSB-BCVOugWtiVYV1rl2jRvojBgPpvpylyeue0ovx_IkRdVCmG8bVrmogltscV9JexKEzg_V1c","alg":"RS256","dq":"jlLoEv5kw1mlvOtm8skpeax1T4WPPHtVN1NvB3FfM-rerStlgv3xAQdWT-hCtL8hMkcr_6cLLXmLGStsAZtq_wRiG1dAUbOhqa234To3JuolIhHKAlKZ73uDXtcnRMrQmpsEtEWMX3TyLniENC36eeq2tZ-V9F5oE_MnKDPeIAE","n":"qO0if2kFF27iIeQVyxVEj6QWSQbFyBMlyGRuXi4skPYFKd7o7-RdCPPTDjYkEsrxLBR7XG8wFiwBEFOyB4LN0Ef4F0XmNYmdjZiyQfYgCTDSFRVouj879mwYcP-TxmXjMjx19FREBrCkS_eNYUWdUJD17iz-fb_zp1EbpT3cms3nlvSG_ULJow69B-4sqRgNX3kPP8_HAqaXoH2LEN6IgWptAAE4v3LDBHvlquM-OPtj3dnGzxL7smDNgu2F7lJakDC6T58i8bUYwueSl0KMjf705bQ-h3FbwmZsy1vukihoqcd2OwOhSf5E6IyL9MfEmewBBED2JUMBZA45NLZfwQ"}'
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: historisk
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/historisk"
+      APP_AUDIT_HOST: localhost
+      APP_AUDIT_PORT: 1111
+
+  postgres:
+    image: "postgres:18.6"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    ports:
+      - "5032:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: historisk
+      POSTGRES_DB: historisk

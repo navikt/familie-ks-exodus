@@ -1,0 +1,50 @@
+<configuration>
+    <springProfile name="!dev &amp; !test">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+        </appender>
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+        </root>
+    </springProfile>
+
+    <springProfile name="dev | test">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<!--            <filter class="no.nav.historisk.innsyn.LogFilter" />-->
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+        </root>
+        <root level="info" />
+    </springProfile>
+
+    <springProperty name="syslogHost" source="audit.syslog.host"/>
+    <springProperty name="syslogPort" source="audit.syslog.port"/>
+    <springProperty name="applicationName" source="spring.application.name"/>
+
+    <appender name="auditLogger" class="com.papertrailapp.logback.Syslog4jAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%m%n%xEx</pattern>
+        </layout>
+
+        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
+            <!-- remote system to log to -->
+            <host>${syslogHost}</host>
+            <!-- remote port to log to -->
+            <port>${syslogPort}</port>
+            <!-- IMPORTANT: Set to your application name. -->
+            <ident>${applicationName}</ident>
+            <!-- max log message length in bytes -->
+            <maxMessageLength>128000</maxMessageLength>
+        </syslogConfig>
+    </appender>
+    <logger level="INFO" name="auditLogger" additivity="false">
+        <appender-ref ref="auditLogger" />
+    </logger>
+    <logger level="DEBUG" name="no.nav"/>
+    <logger level="TRACE" name="no.nav.historisk"/>
+    <logger name="org.hibernate.orm.connections.pooling" level="WARN"/>
+</configuration>
