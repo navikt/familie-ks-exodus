@@ -14,7 +14,6 @@ jobs:
       contents: read
       id-token: write
   deploy_dev_ks:
-    if: ${{ false }}
     needs:
       - build
     name: "Deploy til dev (teamfamilie)"
