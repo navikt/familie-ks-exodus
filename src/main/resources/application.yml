@@ -11,7 +11,7 @@ spring:
   main:
     banner-mode: off
   application:
-    name: ${NAIS_APP_NAME:historisk-pensjon}
+    name: familie-ks-exodus
   jackson:
     serialization:
       indent_output: true
