@@ -11,10 +11,10 @@ jobs:
       packages: write
       contents: read
       id-token: write
-  deploy_dev_historisk:
+  deploy_dev_ks:
     needs:
       - build
-    name: "Deploy til dev (historisk)"
+    name: "Deploy til dev (teamfamilie)"
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -22,31 +22,10 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v7
-      - name: Deploy til dev-fss (historisk)
-        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
+      - name: Deploy til dev-fss (teamfamilie)
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: dev-fss
-          RESOURCE: nais/app/backend.yaml
-          VARS: nais/dev.json
-          IMAGE: ${{ needs.build.outputs.image }}
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}
-
-  deploy_dev_helt:
-    needs:
-      - build
-    name: "Deploy til dev (helt)"
-    runs-on: ubuntu-latest
-    permissions:
-      packages: read
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v7
-      - name: Deploy til dev-fss (helt)
-        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
-        env:
-          CLUSTER: dev-fss
-          RESOURCE: nais/app/backend_helt.yaml
-          VARS: nais/dev.json
+          RESOURCE: nais/nais-dev.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}

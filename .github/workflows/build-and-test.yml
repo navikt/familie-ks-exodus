@@ -22,22 +22,18 @@ jobs:
       telemetry: ${{ steps.docker-build-push.outputs.telemetry }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
           cache: maven
-          server-id: github
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
       - name: Build artifacts
-        run: mvn --batch-mode verify
+        run: mvn --batch-mode verify --settings .m2/maven-settings.xml
         env:
-          MAVEN_USERNAME: x-access-token
-          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Bygg og push docker image til GAR
-        uses: nais/docker-build-push@8e41f1f58749b9248e376c25d33bfbdd2b1163c0 # v0
+        uses: nais/docker-build-push@f8bc7437f7549c2b08197152d781b98f8727a08a # v0
         id: docker-build-push
         with:
-          team: historisk
+          team: teamfamilie

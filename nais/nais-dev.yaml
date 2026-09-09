@@ -15,7 +15,7 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /oracle/data/dev/creds/ef_infotrygd_q1-user
+      - kvPath: /oracle/data/dev/creds/ks_infotrygd_q1-user
         mountPath: /var/run/secrets/oracle/creds
   accessPolicy:
     inbound:
@@ -30,7 +30,7 @@ spec:
               - t_vedtak
               - t_endring
               - t_rolle
-              - t_ef
+              - t_ks
               - t_beregn_grl
               - sa_sak_10
     outbound:
@@ -72,7 +72,7 @@ spec:
     - https://familie-ks-exodus.dev-fss-pub.nais.io
   env:
     - name: APP_DATASOURCE_URL
-      value: jdbc:oracle:thin:@a01dbfl058.adeo.no:1521/infotrygd_efq
+      value: jdbc:oracle:thin:@a01dbfl058.adeo.no:1521/infotrygd_ksq_ha
     - name: APP_DATASOURCE_PLATFORM
       value: org.hibernate.dialect.OracleDialect
     - name: APP_DATASOURCE_DRIVER
@@ -92,4 +92,4 @@ spec:
     - name: spring_profiles_active
       value: "{{springProfiles}}"
     - name: APP_DEFAULT_SCHEMA
-      value: INFOTRYGD_EFQ
+      value: INFOTRYGD_KSQ
