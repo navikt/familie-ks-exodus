@@ -1,48 +1,38 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: {{helt.app}}
-  namespace: "historisk"
+  name: familie-ks-exodus
+  namespace: teamfamilie
   labels:
-    team: "historisk"
+    team: teamfamilie
 spec:
   image: {{ image }}
   port: 8080
   azure:
     application:
       enabled: true
-      tenant: {{azureTenant}}
-      allowAllUsers: false
-      claims:
-        extra:
-          - NAVident
-        groups:
-          - id: {{gruppe.admin}}
   webproxy: true
   vault:
     enabled: true
     paths:
-      - kvPath: {{helt.vault.credentials}}
-        mountPath: /secrets/oracle/credentials
-      - kvPath: {{helt.vault.config}}
-        mountPath: /secrets/oracle/config
+      - kvPath: /oracle/data/dev/creds/ef_infotrygd_q1-user
+        mountPath: /var/run/secrets/oracle/creds
   accessPolicy:
     inbound:
       rules:
-        - application: historisk-helt-infotrygd
-          namespace: historisk
-          cluster: {{env}}-gcp
+        - application: familie-ks-infotrygd-replika
+          namespace: teamfamilie
+          cluster: dev-gcp
           permissions:
             roles:
-              # ip-tabeller
-              - ip_personkort_90
-              # sak-tabeller
-              - sa_sak_10
-              - t_helsetjeneste
-              - t_helsetj_utbet
               - t_lopenr_fnr
-              - t_regel_konto
-              - t_kodeverk
+              - t_stonad
+              - t_vedtak
+              - t_endring
+              - t_rolle
+              - t_ef
+              - t_beregn_grl
+              - sa_sak_10
     outbound:
       rules: []
   strategy:
@@ -78,24 +68,28 @@ spec:
         - id: elastic
         - id: loki
   ingresses:
-    - {{helt.appIngress}}
-    - {{helt.appInternalIngress}}
+    - https://familie-ks-exodus.intern.dev.nav.no
+    - https://familie-ks-exodus.dev-fss-pub.nais.io
   env:
+    - name: APP_DATASOURCE_URL
+      value: jdbc:oracle:thin:@a01dbfl058.adeo.no:1521/infotrygd_efq
+    - name: APP_DATASOURCE_PLATFORM
+      value: org.hibernate.dialect.OracleDialect
+    - name: APP_DATASOURCE_DRIVER
+      value: oracle.jdbc.driver.OracleDriver
+    - name: APP_DATASOURCE_USERNAME_PATH
+      value: /var/run/secrets/oracle/creds/username
+    - name: APP_DATASOURCE_PASSWORD_PATH
+      value: /var/run/secrets/oracle/creds/password
     - name: APP_DDL_AUTO
       value: "none"
-    - name: APP_GRUPPE_ADMIN
-      value: "{{gruppe.admin}}"
-    - name: APP_TILGANGER_PENSJON
-      value: "{{tilganger.pensjon}}"
     - name: APP_AUDIT_HOST
       value: "audit.nais"
     - name: APP_AUDIT_PORT
       value: "6514"
     - name: APP_UTTREKKSHENTERE_ROWID
-      value: "ip_personkort_90"
+      value: " "
     - name: spring_profiles_active
       value: "{{springProfiles}}"
-    - name: "APP_DEFAULT_SCHEMA"
-      value: "{{helt.schema}}"
-    - name: "APP_DDL_AUTO"
-      value: "none"
+    - name: APP_DEFAULT_SCHEMA
+      value: INFOTRYGD_EFQ

@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.nav.historisk</groupId>
-    <artifactId>historisk-exodus</artifactId>
+    <artifactId>familie-ks-exodus</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>historisk-pensjon</name>
-    <description>Historisk exodus Infotrygd</description>
+    <name>familie-ks-exodus</name>
+    <description>familie-ks-exodus - en klon av Historisk exodus Infotrygd</description>
 
     <properties>
         <java.version>25</java.version>

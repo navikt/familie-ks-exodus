@@ -1,4 +1,6 @@
-# Historisk Exodus - tilgjengeliggjøring av tabeller for migrering til GCP
+# Familie-ks-exodus - en klon av Historisk Exodus - tilgjengeliggjøring av tabeller for migrering til GCP
+
+orginal: https://github.com/navikt/historisk-exodus
 
 Dette er en applikasjon som gir tilgang til historiske data som opprinnelig kommer fra Infotrygd slik at de kan
 replikeres til PostgreSQL i GCP.
