@@ -25,14 +25,9 @@ spec:
           cluster: dev-gcp
           permissions:
             roles:
-              - t_lopenr_fnr
-              - t_stonad
-              - t_vedtak
-              - t_endring
-              - t_rolle
-              - t_ks
-              - t_beregn_grl
-              - sa_sak_10
+              - ks_barn_10
+              - ks_stonad_20
+              - ks_utbetaling_30
     outbound:
       rules: []
   strategy:
