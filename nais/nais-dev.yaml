@@ -23,6 +23,11 @@ spec:
         - application: azure-token-generator
           namespace: nais
           cluster: dev-gcp
+          permissions:
+            roles:
+              - ks_barn_10
+              - ks_stonad_20
+              - ks_utbetaling_30
         - application: familie-ks-infotrygd-replika
           namespace: teamfamilie
           cluster: dev-gcp
