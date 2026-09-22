@@ -28,6 +28,20 @@ spec:
               - ks_barn_10
               - ks_stonad_20
               - ks_utbetaling_30
+              - ks_person_01
+              - ks_utbet_hist_40
+              - sa_sak_10
+              - sa_status_15
+              - sa_saksblokk_05
+              - sa_person_01
+              - sa_hendelse_20
+              - t_lopenr_fnr
+              - t_stonad
+              - t_vedtak
+              - t_endring
+              - t_delytelse
+              - t_beslut
+              - t_beregningstype
         - application: familie-ks-infotrygd-replika
           namespace: teamfamilie
           cluster: dev-gcp
