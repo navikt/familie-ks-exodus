@@ -1,0 +1,104 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: familie-ks-exodus
+  namespace: teamfamilie
+  labels:
+    team: teamfamilie
+spec:
+  image: {{ image }}
+  port: 8080
+  azure:
+    application:
+      enabled: true
+  webproxy: true
+  vault:
+    enabled: true
+    paths:
+      - kvPath: /oracle/data/prod/creds/ks_infotrygd_p-user
+        mountPath: /var/run/secrets/oracle/creds
+  accessPolicy:
+    inbound:
+      rules:
+        - application: familie-ks-infotrygd-replika
+          namespace: teamfamilie
+          cluster: prod-gcp
+          permissions:
+            roles:
+              - ks_barn_10
+              - ks_stonad_20
+              - ks_utbetaling_30
+              - ks_person_01
+              - ks_utbet_hist_40
+              - sa_sak_10
+              - sa_status_15
+              - sa_saksblokk_05
+              - sa_person_01
+              - sa_hendelse_20
+              - t_lopenr_fnr
+              - t_stonad
+              - t_vedtak
+              - t_endring
+              - t_delytelse
+              - t_beslut
+              - t_beregningstype
+    outbound:
+      rules: []
+  strategy:
+    type: RollingUpdate
+  liveness:
+    path: /actuator/health
+    initialDelay: 20
+    timeout: 5
+    periodSeconds: 5
+    failureThreshold: 50
+  readiness:
+    path: /actuator/health
+    initialDelay: 20
+    timeout: 5
+    failureThreshold: 1000
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 1024Mi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+  replicas:
+    min: 1
+    max: 2
+    cpuThresholdPercentage: 90
+  prometheus:
+    enabled: true
+    path: /actuator/prometheus
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
+  ingresses:
+    - https://familie-ks-exodus.intern.nav.no
+    - https://familie-ks-exodus.prod-fss-pub.nais.io
+  env:
+    - name: APP_DATASOURCE_URL
+      value: jdbc:oracle:thin:@a01dbfl060.adeo.no:1521/infotrygd_ksp_ha
+    - name: APP_DATASOURCE_PLATFORM
+      value: org.hibernate.dialect.OracleDialect
+    - name: APP_DATASOURCE_DRIVER
+      value: oracle.jdbc.driver.OracleDriver
+    - name: APP_DATASOURCE_USERNAME_PATH
+      value: /var/run/secrets/oracle/creds/username
+    - name: APP_DATASOURCE_PASSWORD_PATH
+      value: /var/run/secrets/oracle/creds/password
+    - name: APP_DDL_AUTO
+      value: "none"
+    - name: APP_AUDIT_HOST
+      value: "audit.nais"
+    - name: APP_AUDIT_PORT
+      value: "6514"
+    - name: APP_UTTREKKSHENTERE_ROWID
+      value: " "
+    - name: spring_profiles_active
+      value: "{{springProfiles}}"
+    - name: APP_DEFAULT_SCHEMA
+      value: INFOTRYGD_KSP
