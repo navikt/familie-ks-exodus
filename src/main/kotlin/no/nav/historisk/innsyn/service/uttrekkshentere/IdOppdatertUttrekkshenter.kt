@@ -149,7 +149,7 @@ class IdOppdatertUttrekkshenter(private val jdbcTemplate: NamedParameterJdbcTemp
                 jdbcTemplate.query(sql, params, mapper)
             }
 
-            logger.debug("finnRaderMedIterator: Kjørte følgende SQL (tid: {}ms, params: {}): {}", millis, params, sql)
+            logger.info("finnRaderMedIterator: Kjørte følgende SQL (tid: {}ms, params: {}): {}", millis, params, sql)
 
             res.addAll(rader)
 
