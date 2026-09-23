@@ -16,11 +16,6 @@ spring:
     hibernate:
       ddl-auto: validate
 
-audit:
-  syslog:
-    host: localhost
-    port: 16515
-
 no.nav.security.jwt:
   expirythreshold: 60 #threshold in minutes until token expires
   issuer:

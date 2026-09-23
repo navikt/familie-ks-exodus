@@ -114,10 +114,6 @@ spec:
       value: /var/run/secrets/oracle/creds/password
     - name: APP_DDL_AUTO
       value: "none"
-    - name: APP_AUDIT_HOST
-      value: "audit.nais"
-    - name: APP_AUDIT_PORT
-      value: "6514"
     - name: APP_UTTREKKSHENTERE_ROWID
       value: " "
     - name: spring_profiles_active
