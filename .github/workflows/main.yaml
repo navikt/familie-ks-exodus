@@ -32,7 +32,6 @@ jobs:
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
   deploy_prod_ks:
-    if: ${{ false }}
     needs:
       - build
       - deploy_dev_ks
@@ -48,6 +47,6 @@ jobs:
         uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: prod-fss
-          RESOURCE: nais/prod.yaml
+          RESOURCE: nais/nais-prod.yaml
           IMAGE: ${{ needs.build.outputs.image }}
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
