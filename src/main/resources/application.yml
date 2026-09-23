@@ -45,11 +45,6 @@ management:
 #oidc...
 http.proxy.parametername: notused
 
-audit:
-  syslog:
-    host: ${APP_AUDIT_HOST}
-    port: ${APP_AUDIT_PORT}
-
 no.nav.security.jwt:
   expirythreshold: 60 #threshold in minutes until token expires
   issuer:

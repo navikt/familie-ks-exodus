@@ -75,8 +75,6 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: historisk
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/historisk"
-      APP_AUDIT_HOST: localhost
-      APP_AUDIT_PORT: 1111
 
   postgres:
     image: "postgres:18.6"
