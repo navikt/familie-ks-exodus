@@ -7,7 +7,7 @@ services:
       - "3000:80"
 
   wonderwall:
-    image: ghcr.io/nais/wonderwall:2026-08-14-123343-d0fccc8
+    image: ghcr.io/nais/wonderwall:2026-09-16-074238-c45c1d2
     #todo oppdater navn
     command:
       - "--bind-address"
