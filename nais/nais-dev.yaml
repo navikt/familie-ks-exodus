@@ -11,10 +11,6 @@ spec:
   azure:
     application:
       enabled: true
-      allowAllUsers: false
-      claims:
-        groups:
-          - id: "teamfamilie-forvaltning"
   webproxy: true
   vault:
     enabled: true
