@@ -59,11 +59,10 @@ spec:
     failureThreshold: 1000
   resources:
     limits:
-      cpu: 1500m
-      memory: 1024Mi
+      memory: 600Mi
     requests:
-      cpu: 500m
-      memory: 256Mi
+      cpu: 100m
+      memory: 600Mi
   replicas:
     min: 1
     max: 2
@@ -102,3 +101,5 @@ spec:
       value: "{{springProfiles}}"
     - name: APP_DEFAULT_SCHEMA
       value: INFOTRYGD_KSP
+    - name: JDK_JAVA_OPTIONS
+      value: "-XX:MinRAMPercentage=25.0 -XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
