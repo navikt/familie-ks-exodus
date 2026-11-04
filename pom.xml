@@ -20,12 +20,12 @@
         <tomcat.version>11.0.25</tomcat.version>
         <token-validation.version>7.0.1</token-validation.version>
         <datasource-proxy.version>1.11.1</datasource-proxy.version>
-        <springdoc-openapi-ui.version>3.1.1</springdoc-openapi-ui.version>
+        <springdoc-openapi-ui.version>3.2.0</springdoc-openapi-ui.version>
         <httpclient.version>4.5.14</httpclient.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
-        <mockwebserver.version>5.5.0</mockwebserver.version>
-        <okhttp.version>5.5.0</okhttp.version>
-        <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+        <mockwebserver.version>5.5.1</mockwebserver.version>
+        <okhttp.version>5.5.1</okhttp.version>
+        <jacoco-maven-plugin.version>0.8.16</jacoco-maven-plugin.version>
         <ojdbc8.version>19.3.0.0</ojdbc8.version>
     </properties>
 
