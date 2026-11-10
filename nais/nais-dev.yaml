@@ -69,13 +69,13 @@ spec:
   strategy:
     type: RollingUpdate
   liveness:
-    path: /actuator/health
+    path: /internal/health/liveness
     initialDelay: 20
     timeout: 5
     periodSeconds: 5
     failureThreshold: 50
   readiness:
-    path: /actuator/health
+    path: /internal/health/readiness
     initialDelay: 20
     timeout: 5
     failureThreshold: 1000
@@ -91,7 +91,7 @@ spec:
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
-    path: /actuator/prometheus
+    path: /internal/prometheus
   observability:
     logging:
       destinations:
